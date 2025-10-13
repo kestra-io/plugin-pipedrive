@@ -1,10 +1,10 @@
 {
-  "name": "plugin-template",
+  "name": "plugin-pipedrive",
   "build": {
     "context": ".",
     "dockerfile": "Dockerfile"
   },
-  "workspaceFolder": "/workspaces/plugin-template",
+  "workspaceFolder": "/workspaces/plugin-pipedrive",
   "forwardPorts": [8080],
   "customizations": {
     "vscode": {

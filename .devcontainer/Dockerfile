@@ -14,9 +14,9 @@ ENV HOME="/root"
 # --------------------------------------
 # Git
 # --------------------------------------
-# Need to add the devcontainer workspace folder as a safe directory to enable git 
+# Need to add the devcontainer workspace folder as a safe directory to enable git
 # version control system to be enabled in the containers file system.
-RUN git config --global --add safe.directory "/workspaces/plugin-template"
+RUN git config --global --add safe.directory "/workspaces/plugin-pipedrive"
 # --------------------------------------
 
 # --------------------------------------
@@ -57,7 +57,7 @@ ENV KESTRA_PLUGINS_PATH="/workspaces/plugin-template/local/plugins"
 # --------------------------------------
 
 # --------------------------------------
-# SSH 
+# SSH
 # --------------------------------------
 RUN mkdir -p ~/.ssh
 RUN touch ~/.ssh/config
