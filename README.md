@@ -28,26 +28,248 @@
 </p>
 
 <br />
-<p align="center">
-    <a href="https://go.kestra.io/video/product-overview" target="_blank">
-        <img src="https://kestra.io/startvideo.png" alt="Get started in 3 minutes with Kestra" width="640px" />
-    </a>
-</p>
-<p align="center" style="color:grey;"><i>Get started with Kestra in 3 minutes.</i></p>
 
+# Kestra Plugin Pipedrive
 
-# Kestra Plugin Template
+> A Kestra plugin for integrating with Pipedrive CRM
 
-> A template for creating Kestra plugins
-
-This repository serves as a general template for creating a new [Kestra](https://github.com/kestra-io/kestra) plugin. It should take only a few minutes! Use this repository as a scaffold to ensure that you've set up the plugin correctly, including unit tests and CI/CD workflows.
+This plugin provides tasks for interacting with [Pipedrive CRM](https://www.pipedrive.com/), enabling you to automate your sales workflows by managing contacts, deals, notes, and other CRM activities directly from Kestra.
 
 ![Kestra orchestrator](https://kestra.io/video.gif)
 
-## Running the project in local
-### Prerequisites
-- Java 21
-- Docker
+## Features
+
+✅ **Person Management**
+- Create new contacts in Pipedrive
+- Retrieve contact information
+- Associate contacts with organizations
+
+✅ **Deal Management**
+- Create new sales opportunities
+- Update deal status and value
+- Move deals through pipeline stages
+- Link deals to contacts and organizations
+
+✅ **Notes & Activities**
+- Add notes to deals, contacts, or organizations
+- Pin important notes
+- Track customer interactions
+
+✅ **Robust Integration**
+- API token authentication
+- Automatic retry with exponential backoff
+- Rate limit handling
+- Comprehensive error handling
+
+## Installation
+
+Add the plugin to your Kestra instance. The plugin will be available in the task list under the Pipedrive category.
+
+## Prerequisites
+
+- A Pipedrive account
+- Pipedrive API token (found in Settings → Personal Preferences → API)
+- Java 21 or higher (for development)
+
+## Configuration
+
+### API Token
+
+Store your Pipedrive API token as a secret in Kestra:
+
+```yaml
+secrets:
+  PIPEDRIVE_API_TOKEN: "your-api-token-here"
+```
+
+## Available Tasks
+
+### Person Tasks
+
+#### CreatePerson
+Creates a new person (contact) in Pipedrive.
+
+```yaml
+- id: create_contact
+  type: io.kestra.plugin.pipedrive.persons.CreatePerson
+  apiToken: "{{ secret('PIPEDRIVE_API_TOKEN') }}"
+  name: "John Doe"
+  emails:
+    - value: "john.doe@example.com"
+      primary: true
+  phones:
+    - value: "+1234567890"
+      primary: true
+```
+
+#### GetPerson
+Retrieves information about a specific person.
+
+```yaml
+- id: get_contact
+  type: io.kestra.plugin.pipedrive.persons.GetPerson
+  apiToken: "{{ secret('PIPEDRIVE_API_TOKEN') }}"
+  personId: 123
+```
+
+### Deal Tasks
+
+#### CreateDeal
+Creates a new deal in Pipedrive.
+
+```yaml
+- id: create_opportunity
+  type: io.kestra.plugin.pipedrive.deals.CreateDeal
+  apiToken: "{{ secret('PIPEDRIVE_API_TOKEN') }}"
+  title: "Enterprise Software License"
+  value: 50000
+  currency: "USD"
+  personId: 123
+  stageId: 1
+```
+
+#### UpdateDeal
+Updates an existing deal.
+
+```yaml
+- id: update_opportunity
+  type: io.kestra.plugin.pipedrive.deals.UpdateDeal
+  apiToken: "{{ secret('PIPEDRIVE_API_TOKEN') }}"
+  dealId: 456
+  status: "won"
+  value: 75000
+```
+
+### Note Tasks
+
+#### AddNote
+Adds a note to a deal, person, or organization.
+
+```yaml
+- id: add_customer_note
+  type: io.kestra.plugin.pipedrive.notes.AddNote
+  apiToken: "{{ secret('PIPEDRIVE_API_TOKEN') }}"
+  content: "Customer requested follow-up call next week"
+  dealId: 123
+  pinnedToDealFlag: true
+```
+
+## Complete Workflow Example
+
+Here's a complete example that creates a contact, creates a deal, and adds a note:
+
+```yaml
+id: pipedrive_sales_automation
+namespace: company.sales
+
+tasks:
+  - id: create_person
+    type: io.kestra.plugin.pipedrive.persons.CreatePerson
+    apiToken: "{{ secret('PIPEDRIVE_API_TOKEN') }}"
+    name: "{{ inputs.customer_name }}"
+    emails:
+      - value: "{{ inputs.customer_email }}"
+        primary: true
+
+  - id: create_deal
+    type: io.kestra.plugin.pipedrive.deals.CreateDeal
+    apiToken: "{{ secret('PIPEDRIVE_API_TOKEN') }}"
+    title: "{{ inputs.deal_title }}"
+    value: "{{ inputs.deal_value }}"
+    currency: "USD"
+    personId: "{{ outputs.create_person.personId }}"
+    stageId: 1
+
+  - id: add_note
+    type: io.kestra.plugin.pipedrive.notes.AddNote
+    apiToken: "{{ secret('PIPEDRIVE_API_TOKEN') }}"
+    content: "Lead generated from website form"
+    dealId: "{{ outputs.create_deal.dealId }}"
+    pinnedToDealFlag: true
+
+inputs:
+  - id: customer_name
+    type: STRING
+    required: true
+  - id: customer_email
+    type: STRING
+    required: true
+  - id: deal_title
+    type: STRING
+    required: true
+  - id: deal_value
+    type: INT
+    required: true
+```
+
+## Use Cases
+
+- **Lead Automation**: Automatically create contacts and deals from form submissions
+- **Sales Pipeline Automation**: Move deals through stages based on customer actions
+- **Customer Follow-up**: Add notes and schedule activities based on workflow triggers
+- **Data Synchronization**: Sync customer data between Pipedrive and other systems
+- **Reporting**: Extract deal data for custom analytics and reporting
+
+## Development
+
+### Running Locally
+
+```bash
+# Build the plugin
+./gradlew build
+
+# Run tests
+./gradlew test
+
+# Run with test coverage
+./gradlew test jacocoTestReport
+```
+
+### Project Structure
+
+```
+src/
+├── main/java/io/kestra/plugin/pipedrive/
+│   ├── client/          # HTTP client for Pipedrive API
+│   ├── models/          # Data models (Person, Deal, Note, etc.)
+│   ├── persons/         # Person-related tasks
+│   ├── deals/           # Deal-related tasks
+│   └── notes/           # Note-related tasks
+└── test/
+    ├── java/            # Unit tests
+    └── resources/flows/ # Example flows
+```
+
+## API Documentation
+
+For more information about the Pipedrive API, visit:
+- [Pipedrive API Documentation](https://pipedrive.readme.io/docs/api-introduction)
+- [Pipedrive API Reference](https://developers.pipedrive.com/docs/api/v1)
+
+## Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
+
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add some amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+## License
+
+This project is licensed under the Apache License 2.0 - see the [LICENSE](LICENSE) file for details.
+
+## Support
+
+- [Kestra Documentation](https://kestra.io/docs)
+- [Kestra Community Slack](https://kestra.io/slack)
+- [GitHub Issues](https://github.com/kestra-io/plugin-pipedrive/issues)
+
+---
+
+Built with ❤️ by the Kestra community
+
 
 ### Running tests
 ```
