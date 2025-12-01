@@ -50,9 +50,6 @@ dependencies {
     compileOnly group: "io.kestra", name: "core", version: kestraVersion
     compileOnly group: "io.kestra", name: "script", version: kestraVersion
 
-    // HTTP client
-    implementation "com.squareup.okhttp3:okhttp:4.12.0"
-    
     // JSON processing (versions managed by Jackson BOM)
     implementation "com.fasterxml.jackson.core:jackson-databind"
     implementation "com.fasterxml.jackson.core:jackson-annotations"
@@ -103,7 +100,7 @@ dependencies {
     testImplementation "org.junit.jupiter:junit-jupiter-engine"
     testImplementation "org.hamcrest:hamcrest"
     testImplementation "org.hamcrest:hamcrest-library"
-    
+
     // HTTP mocking
     testImplementation "com.squareup.okhttp3:mockwebserver:4.12.0"
 }

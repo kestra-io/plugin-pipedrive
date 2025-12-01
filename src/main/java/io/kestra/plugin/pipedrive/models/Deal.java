@@ -1,8 +1,12 @@
 package io.kestra.plugin.pipedrive.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 import java.util.Map;
@@ -15,6 +19,7 @@ import java.util.Map;
 @NoArgsConstructor
 @AllArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class Deal {
     @JsonProperty("id")
     private Integer id;
@@ -51,6 +56,36 @@ public class Deal {
 
     @JsonProperty("expected_close_date")
     private String expectedCloseDate;
+
+    @JsonProperty("local_won_date")
+    private String localWonDate;
+
+    @JsonProperty("local_lost_date")
+    private String localLostDate;
+
+    @JsonProperty("local_close_date")
+    private String localCloseDate;
+
+    @JsonProperty("origin")
+    private String origin;
+
+    @JsonProperty("origin_id")
+    private String originId;
+
+    @JsonProperty("channel")
+    private Integer channel;
+
+    @JsonProperty("channel_id")
+    private String channelId;
+
+    @JsonProperty("acv")
+    private BigDecimal acv;
+
+    @JsonProperty("arr")
+    private BigDecimal arr;
+
+    @JsonProperty("mrr")
+    private BigDecimal mrr;
 
     @JsonProperty("close_time")
     private String closeTime;

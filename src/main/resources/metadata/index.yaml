@@ -2,7 +2,7 @@ group: io.kestra.plugin.pipedrive
 name: "pipedrive"
 title: "Pipedrive"
 description: "Plugin Pipedrive for Kestra"
-body: ""
+body: "Create, update and fetch Pipedrive deals and persons."
 videos: []
 createdBy: "Kestra Core Team"
 managedBy: "Kestra Core Team"

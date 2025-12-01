@@ -1,8 +1,12 @@
 package io.kestra.plugin.pipedrive.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.util.List;
 import java.util.Map;
@@ -15,6 +19,7 @@ import java.util.Map;
 @NoArgsConstructor
 @AllArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class Person {
     @JsonProperty("id")
     private Integer id;
@@ -28,11 +33,11 @@ public class Person {
     @JsonProperty("last_name")
     private String lastName;
 
-    @JsonProperty("email")
-    private List<EmailInfo> email;
+    @JsonProperty("emails")
+    private List<EmailInfo> emails;
 
-    @JsonProperty("phone")
-    private List<PhoneInfo> phone;
+    @JsonProperty("phones")
+    private List<PhoneInfo> phones;
 
     @JsonProperty("org_id")
     private Integer orgId;
