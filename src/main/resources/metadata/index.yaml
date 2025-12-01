@@ -1,0 +1,8 @@
+group: io.kestra.plugin.pipedrive
+name: "pipedrive"
+title: "Pipedrive"
+description: "Plugin Pipedrive for Kestra"
+body: ""
+videos: []
+createdBy: "Kestra Core Team"
+managedBy: "Kestra Core Team"
