@@ -1,0 +1,5 @@
+package: "io.kestra.plugin.pipedrive.persons"
+name: "pipedrive-persons"
+title: "Pipedrive Persons"
+description: "Tasks to create or fetch persons from Pipedrive."
+icon: "io.kestra.plugin.pipedrive.persons.svg"
