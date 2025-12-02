@@ -1,0 +1,5 @@
+package: "io.kestra.plugin.pipedrive.deals"
+name: "pipedrive-deals"
+title: "Pipedrive Deals"
+description: "Tasks to create and update deals in Pipedrive."
+icon: "io.kestra.plugin.pipedrive.deals.svg"
