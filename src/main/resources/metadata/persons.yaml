@@ -1,5 +1,6 @@
 package: "io.kestra.plugin.pipedrive.persons"
 name: "pipedrive-persons"
 title: "Pipedrive Persons"
-description: "Tasks to create or fetch persons from Pipedrive."
+description: "Tasks that create or fetch persons from Pipedrive."
+body: "Use your `apiToken` to add or retrieve person records with properties like `name`, `email`, `phone`, and organization IDs, returning the contact data for enrichment or downstream syncing."
 icon: "io.kestra.plugin.pipedrive.persons.svg"
