@@ -1,6 +1,8 @@
-package: "io.kestra.plugin.pipedrive.deals"
+group: io.kestra.plugin.pipedrive.deals
 name: "pipedrive-deals"
 title: "Pipedrive Deals"
 description: "Tasks that create or update deals in Pipedrive."
 body: "Provide the Pipedrive `apiToken` along with deal fields such as `title`, `value`, `currency`, and pipeline/stage IDs to insert or modify deals and capture the returned deal payload for further automation."
-icon: "io.kestra.plugin.pipedrive.deals.svg"
+videos: []
+createdBy: "Kestra Core Team"
+managedBy: "Kestra Core Team"
