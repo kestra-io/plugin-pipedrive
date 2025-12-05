@@ -1,8 +1,8 @@
 group: io.kestra.plugin.pipedrive
 name: "pipedrive"
 title: "Pipedrive"
-description: "Plugin Pipedrive for Kestra"
-body: "Create, update and fetch Pipedrive deals and persons."
+description: "Tasks that manage Pipedrive deals and persons."
+body: "Authenticate with your Pipedrive `apiToken` (and optional `apiUrl`) to create or update deals and create or fetch people records, returning the API payloads for routing to CRM or reporting steps."
 videos: []
 createdBy: "Kestra Core Team"
 managedBy: "Kestra Core Team"
