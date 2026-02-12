@@ -1,8 +1,6 @@
 @PluginSubGroup(
     title = "Pipedrive Persons",
-    description = "Tasks to create and retrieve contacts in Pipedrive.",
-    categories = PluginSubGroup.PluginCategory.TOOL,
-    categories = {
+    description = "Tasks to create and retrieve contacts in Pipedrive.",categories = {
         PluginSubGroup.PluginCategory.BUSINESS
     }
 )

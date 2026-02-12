@@ -1,8 +1,6 @@
 @PluginSubGroup(
     title = "Pipedrive Deals",
-    description = "Tasks to create and update deals in Pipedrive.",
-    categories = PluginSubGroup.PluginCategory.TOOL,
-    categories = {
+    description = "Tasks to create and update deals in Pipedrive.",categories = {
         PluginSubGroup.PluginCategory.BUSINESS
     }
 )

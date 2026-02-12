@@ -1,8 +1,6 @@
 @PluginSubGroup(
     title = "Pipedrive",
-    description = "Integrate with Pipedrive CRM to manage contacts, deals, and sales pipeline.",
-    categories = PluginSubGroup.PluginCategory.TOOL,
-    categories = {
+    description = "Integrate with Pipedrive CRM to manage contacts, deals, and sales pipeline.",categories = {
         PluginSubGroup.PluginCategory.BUSINESS
     }
 )
