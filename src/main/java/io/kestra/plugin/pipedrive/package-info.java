@@ -1,7 +1,8 @@
 @PluginSubGroup(
     title = "Pipedrive",
-    description = "Integrate with Pipedrive CRM to manage contacts, deals, and sales pipeline.",
-    categories = PluginSubGroup.PluginCategory.TOOL
+    description = "Integrate with Pipedrive CRM to manage contacts, deals, and sales pipeline.",categories = {
+        PluginSubGroup.PluginCategory.BUSINESS
+    }
 )
 package io.kestra.plugin.pipedrive;
 
