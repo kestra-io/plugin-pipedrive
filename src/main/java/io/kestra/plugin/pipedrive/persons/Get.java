@@ -65,7 +65,7 @@ public class Get extends AbstractPipedriveTask implements RunnableTask<Get.Outpu
 
     @Schema(
         title = "Fetch strategy",
-        description = "How to fetch the person data (fetch, fetch one or store)"
+        description = "How to fetch the person data (fetch, fetch one, or store)"
     )
     @NotNull
     @Builder.Default

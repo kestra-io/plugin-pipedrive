@@ -70,8 +70,7 @@ import java.util.Map;
 public class Update extends AbstractPipedriveTask implements RunnableTask<Update.Output> {
 
     @Schema(
-        title = "Deal ID",
-        description = "ID of the deal to update"
+        title = "Deal ID"
     )
     @NotNull
     private Property<Integer> dealId;

@@ -70,15 +70,13 @@ import java.util.Map;
 public class Create extends AbstractPipedriveTask implements RunnableTask<Create.Output> {
 
     @Schema(
-        title = "Deal title",
-        description = "Title of the deal"
+        title = "Deal title"
     )
     @NotNull
     private Property<String> title;
 
     @Schema(
-        title = "Deal value",
-        description = "Value of the deal"
+        title = "Deal value"
     )
     private Property<BigDecimal> value;
 
