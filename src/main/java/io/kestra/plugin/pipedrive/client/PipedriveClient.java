@@ -1,6 +1,17 @@
 package io.kestra.plugin.pipedrive.client;
 
+import java.io.Closeable;
+import java.io.IOException;
+import java.net.URI;
+import java.net.http.HttpHeaders;
+import java.nio.charset.StandardCharsets;
+import java.util.List;
+import java.util.Map;
+
+import org.slf4j.Logger;
+
 import com.fasterxml.jackson.core.type.TypeReference;
+
 import io.kestra.core.exceptions.IllegalVariableEvaluationException;
 import io.kestra.core.http.HttpRequest;
 import io.kestra.core.http.HttpResponse;
@@ -10,15 +21,6 @@ import io.kestra.core.http.client.configurations.HttpConfiguration;
 import io.kestra.core.runners.RunContext;
 import io.kestra.core.serializers.JacksonMapper;
 import io.kestra.plugin.pipedrive.models.PipedriveResponse;
-import org.slf4j.Logger;
-
-import java.io.Closeable;
-import java.io.IOException;
-import java.net.URI;
-import java.net.http.HttpHeaders;
-import java.nio.charset.StandardCharsets;
-import java.util.List;
-import java.util.Map;
 
 public class PipedriveClient implements Closeable {
     public static final String DEFAULT_BASE_URL = "https://api.pipedrive.com/api/v2";
@@ -35,10 +37,9 @@ public class PipedriveClient implements Closeable {
         this.apiToken = apiToken;
         this.logger = runContext.logger();
 
-        String resolvedBaseUrl =
-            (baseUrl == null || baseUrl.isBlank())
-                ? DEFAULT_BASE_URL
-                : baseUrl;
+        String resolvedBaseUrl = (baseUrl == null || baseUrl.isBlank())
+            ? DEFAULT_BASE_URL
+            : baseUrl;
 
         this.baseUrl = resolvedBaseUrl.endsWith("/")
             ? resolvedBaseUrl.substring(0, resolvedBaseUrl.length() - 1)
@@ -71,11 +72,12 @@ public class PipedriveClient implements Closeable {
             .uri(URI.create(url))
             .method("POST")
             .headers(HttpHeaders.of(Map.of("Content-Type", List.of("application/json")), (s1, s2) -> true))
-            .body(HttpRequest.StringRequestBody.builder()
-                .contentType("application/json")
-                .charset(StandardCharsets.UTF_8)
-                .content(jsonBody)
-                .build()
+            .body(
+                HttpRequest.StringRequestBody.builder()
+                    .contentType("application/json")
+                    .charset(StandardCharsets.UTF_8)
+                    .content(jsonBody)
+                    .build()
             )
             .build();
 
@@ -90,11 +92,12 @@ public class PipedriveClient implements Closeable {
             .uri(URI.create(url))
             .method("PUT")
             .headers(HttpHeaders.of(Map.of("Content-Type", List.of("application/json")), (s1, s2) -> true))
-            .body(HttpRequest.StringRequestBody.builder()
-                .contentType("application/json")
-                .charset(StandardCharsets.UTF_8)
-                .content(jsonBody)
-                .build()
+            .body(
+                HttpRequest.StringRequestBody.builder()
+                    .contentType("application/json")
+                    .charset(StandardCharsets.UTF_8)
+                    .content(jsonBody)
+                    .build()
             )
             .build();
 
@@ -122,8 +125,10 @@ public class PipedriveClient implements Closeable {
 
             if (response.getStatus().getCode() < 200 || response.getStatus().getCode() >= 300) {
                 logger.error("Pipedrive API request failed: {} - {}", response.getStatus().getCode(), responseBody);
-                throw new IOException("Pipedrive API request failed: " +
-                    response.getStatus().getCode() + " - " + responseBody);
+                throw new IOException(
+                    "Pipedrive API request failed: " +
+                        response.getStatus().getCode() + " - " + responseBody
+                );
             }
 
             logger.debug("Pipedrive API response: {}", responseBody);

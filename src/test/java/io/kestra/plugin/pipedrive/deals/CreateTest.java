@@ -1,18 +1,20 @@
 package io.kestra.plugin.pipedrive.deals;
 
-import io.kestra.core.junit.annotations.KestraTest;
-import io.kestra.core.models.property.Property;
-import io.kestra.core.runners.RunContext;
-import io.kestra.core.runners.RunContextFactory;
-import jakarta.inject.Inject;
-import okhttp3.mockwebserver.MockResponse;
-import okhttp3.mockwebserver.MockWebServer;
-import okhttp3.mockwebserver.RecordedRequest;
+import java.math.BigDecimal;
+
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.math.BigDecimal;
+import io.kestra.core.junit.annotations.KestraTest;
+import io.kestra.core.models.property.Property;
+import io.kestra.core.runners.RunContext;
+import io.kestra.core.runners.RunContextFactory;
+
+import jakarta.inject.Inject;
+import okhttp3.mockwebserver.MockResponse;
+import okhttp3.mockwebserver.MockWebServer;
+import okhttp3.mockwebserver.RecordedRequest;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.allOf;
@@ -43,20 +45,22 @@ class CreateTest {
 
     @Test
     void shouldCreateDeal() throws Exception {
-        mockWebServer.enqueue(new MockResponse()
-            .setResponseCode(200)
-            .setHeader("Content-Type", "application/json")
-            .setBody("""
-                {
-                  "success": true,
-                  "data": {
-                    "id": 321,
-                    "status": "open",
-                    "add_time": "2024-01-01T00:00:00Z",
-                    "update_time": "2024-01-01T00:00:00Z"
-                  }
-                }
-                """));
+        mockWebServer.enqueue(
+            new MockResponse()
+                .setResponseCode(200)
+                .setHeader("Content-Type", "application/json")
+                .setBody("""
+                    {
+                      "success": true,
+                      "data": {
+                        "id": 321,
+                        "status": "open",
+                        "add_time": "2024-01-01T00:00:00Z",
+                        "update_time": "2024-01-01T00:00:00Z"
+                      }
+                    }
+                    """)
+        );
 
         RunContext runContext = runContextFactory.of();
 

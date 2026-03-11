@@ -1,6 +1,12 @@
 package io.kestra.plugin.pipedrive.deals;
 
+import java.math.BigDecimal;
+import java.util.Map;
+
+import org.slf4j.Logger;
+
 import com.fasterxml.jackson.core.type.TypeReference;
+
 import io.kestra.core.models.annotations.Example;
 import io.kestra.core.models.annotations.Plugin;
 import io.kestra.core.models.property.Property;
@@ -10,18 +16,15 @@ import io.kestra.plugin.pipedrive.AbstractPipedriveTask;
 import io.kestra.plugin.pipedrive.client.PipedriveClient;
 import io.kestra.plugin.pipedrive.models.Deal;
 import io.kestra.plugin.pipedrive.models.PipedriveResponse;
-import jakarta.validation.constraints.NotNull;
+
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
-import org.slf4j.Logger;
-
-import java.math.BigDecimal;
-import java.util.Map;
 
 @SuperBuilder
 @ToString
@@ -133,8 +136,10 @@ public class Update extends AbstractPipedriveTask implements RunnableTask<Update
         Integer rDealId = runContext.render(this.dealId).as(Integer.class)
             .orElseThrow(() -> new IllegalArgumentException("Deal ID is required"));
 
-        if (title == null && value == null && stageId == null && status == null
-            && expectedCloseDate == null && probability == null && lostReason == null && customFields == null) {
+        if (
+            title == null && value == null && stageId == null && status == null
+                && expectedCloseDate == null && probability == null && lostReason == null && customFields == null
+        ) {
             throw new IllegalArgumentException("At least one field must be provided to update the deal");
         }
 
@@ -186,9 +191,11 @@ public class Update extends AbstractPipedriveTask implements RunnableTask<Update
 
             logger.info("Updating Pipedrive deal with ID: {}", rDealId);
 
-            PipedriveResponse<Deal> response = client.put("/deals/" + rDealId, deal,
+            PipedriveResponse<Deal> response = client.put(
+                "/deals/" + rDealId, deal,
                 new TypeReference<>() {
-                });
+                }
+            );
 
             if (!Boolean.TRUE.equals(response.getSuccess())) {
                 throw new IllegalStateException("Failed to update deal: " + response.getError());

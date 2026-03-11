@@ -1,6 +1,14 @@
 package io.kestra.plugin.pipedrive.persons;
 
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.net.URI;
+import java.util.List;
+
+import org.slf4j.Logger;
+
 import com.fasterxml.jackson.core.type.TypeReference;
+
 import io.kestra.core.models.annotations.Example;
 import io.kestra.core.models.annotations.Plugin;
 import io.kestra.core.models.property.Property;
@@ -12,20 +20,15 @@ import io.kestra.plugin.pipedrive.AbstractPipedriveTask;
 import io.kestra.plugin.pipedrive.client.PipedriveClient;
 import io.kestra.plugin.pipedrive.models.Person;
 import io.kestra.plugin.pipedrive.models.PipedriveResponse;
-import jakarta.validation.constraints.NotNull;
+
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
-import org.slf4j.Logger;
-
-import java.io.BufferedWriter;
-import java.io.FileWriter;
-import java.net.URI;
-import java.util.List;
 
 @SuperBuilder
 @ToString
@@ -84,9 +87,11 @@ public class Get extends AbstractPipedriveTask implements RunnableTask<Get.Outpu
         try (PipedriveClient client = new PipedriveClient(runContext, rApiToken, rApiUrl)) {
             logger.info("Fetching person with ID: {}", rPersonId);
 
-            PipedriveResponse<Person> response = client.get("/persons/" + rPersonId,
+            PipedriveResponse<Person> response = client.get(
+                "/persons/" + rPersonId,
                 new TypeReference<>() {
-                });
+                }
+            );
 
             if (!Boolean.TRUE.equals(response.getSuccess())) {
                 throw new IllegalStateException("Failed to get person: " + response.getError());

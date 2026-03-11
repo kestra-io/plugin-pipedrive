@@ -1,6 +1,12 @@
 package io.kestra.plugin.pipedrive.deals;
 
+import java.math.BigDecimal;
+import java.util.Map;
+
+import org.slf4j.Logger;
+
 import com.fasterxml.jackson.core.type.TypeReference;
+
 import io.kestra.core.models.annotations.Example;
 import io.kestra.core.models.annotations.Plugin;
 import io.kestra.core.models.property.Property;
@@ -10,14 +16,11 @@ import io.kestra.plugin.pipedrive.AbstractPipedriveTask;
 import io.kestra.plugin.pipedrive.client.PipedriveClient;
 import io.kestra.plugin.pipedrive.models.Deal;
 import io.kestra.plugin.pipedrive.models.PipedriveResponse;
+
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
-import org.slf4j.Logger;
-
-import java.math.BigDecimal;
-import java.util.Map;
 
 @SuperBuilder
 @ToString
@@ -214,9 +217,11 @@ public class Create extends AbstractPipedriveTask implements RunnableTask<Create
 
             logger.info("Creating Pipedrive deal '{}'", rDealTitle);
 
-            PipedriveResponse<Deal> response = client.post("/deals", deal,
+            PipedriveResponse<Deal> response = client.post(
+                "/deals", deal,
                 new TypeReference<>() {
-                });
+                }
+            );
 
             if (!Boolean.TRUE.equals(response.getSuccess())) {
                 throw new IllegalStateException("Failed to create deal: " + response.getError());

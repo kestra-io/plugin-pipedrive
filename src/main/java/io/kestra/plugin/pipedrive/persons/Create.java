@@ -1,6 +1,13 @@
 package io.kestra.plugin.pipedrive.persons;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
+import org.slf4j.Logger;
+
 import com.fasterxml.jackson.core.type.TypeReference;
+
 import io.kestra.core.models.annotations.Example;
 import io.kestra.core.models.annotations.Plugin;
 import io.kestra.core.models.property.Property;
@@ -10,15 +17,11 @@ import io.kestra.plugin.pipedrive.AbstractPipedriveTask;
 import io.kestra.plugin.pipedrive.client.PipedriveClient;
 import io.kestra.plugin.pipedrive.models.Person;
 import io.kestra.plugin.pipedrive.models.PipedriveResponse;
+
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
-import org.slf4j.Logger;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
 
 @SuperBuilder
 @ToString
@@ -152,11 +155,13 @@ public class Create extends AbstractPipedriveTask implements RunnableTask<Create
             if (rEmails != null) {
                 List<Person.EmailInfo> emailInfos = new ArrayList<>();
                 for (Map<String, Object> email : rEmails) {
-                    emailInfos.add(Person.EmailInfo.builder()
-                        .value((String) email.get("value"))
-                        .primary((Boolean) email.getOrDefault("primary", false))
-                        .label((String) email.getOrDefault("label", "work"))
-                        .build());
+                    emailInfos.add(
+                        Person.EmailInfo.builder()
+                            .value((String) email.get("value"))
+                            .primary((Boolean) email.getOrDefault("primary", false))
+                            .label((String) email.getOrDefault("label", "work"))
+                            .build()
+                    );
                 }
                 personBuilder.emails(emailInfos);
             }
@@ -164,11 +169,13 @@ public class Create extends AbstractPipedriveTask implements RunnableTask<Create
             if (rPhones != null) {
                 List<Person.PhoneInfo> phoneInfos = new ArrayList<>();
                 for (Map<String, Object> phone : rPhones) {
-                    phoneInfos.add(Person.PhoneInfo.builder()
-                        .value((String) phone.get("value"))
-                        .primary((Boolean) phone.getOrDefault("primary", false))
-                        .label((String) phone.getOrDefault("label", "work"))
-                        .build());
+                    phoneInfos.add(
+                        Person.PhoneInfo.builder()
+                            .value((String) phone.get("value"))
+                            .primary((Boolean) phone.getOrDefault("primary", false))
+                            .label((String) phone.getOrDefault("label", "work"))
+                            .build()
+                    );
                 }
                 personBuilder.phones(phoneInfos);
             }
@@ -181,9 +188,11 @@ public class Create extends AbstractPipedriveTask implements RunnableTask<Create
 
             logger.info("Creating person in Pipedrive: {}", rName);
 
-            PipedriveResponse<Person> response = client.post("/persons", person,
+            PipedriveResponse<Person> response = client.post(
+                "/persons", person,
                 new TypeReference<>() {
-                });
+                }
+            );
 
             if (!Boolean.TRUE.equals(response.getSuccess())) {
                 throw new IllegalStateException("Failed to create person: " + response.getError());

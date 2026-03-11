@@ -1,5 +1,16 @@
 package io.kestra.plugin.pipedrive.persons;
 
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.net.URI;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
 import io.kestra.core.junit.annotations.KestraTest;
 import io.kestra.core.models.property.Property;
 import io.kestra.core.models.tasks.common.FetchType;
@@ -8,20 +19,11 @@ import io.kestra.core.runners.RunContextFactory;
 import io.kestra.core.serializers.FileSerde;
 import io.kestra.core.storages.StorageInterface;
 import io.kestra.core.tenant.TenantService;
+
 import jakarta.inject.Inject;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
 import okhttp3.mockwebserver.RecordedRequest;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.net.URI;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
@@ -56,20 +58,22 @@ class GetTest {
     @Test
     @SuppressWarnings("unchecked")
     void shouldStoreFetchedPerson() throws Exception {
-        mockWebServer.enqueue(new MockResponse()
-            .setResponseCode(200)
-            .setHeader("Content-Type", "application/json")
-            .setBody("""
-                {
-                  "success": true,
-                  "data": {
-                    "id": 12,
-                    "name": "Jane Doe",
-                    "first_name": "Jane",
-                    "last_name": "Doe"
-                  }
-                }
-                """));
+        mockWebServer.enqueue(
+            new MockResponse()
+                .setResponseCode(200)
+                .setHeader("Content-Type", "application/json")
+                .setBody("""
+                    {
+                      "success": true,
+                      "data": {
+                        "id": 12,
+                        "name": "Jane Doe",
+                        "first_name": "Jane",
+                        "last_name": "Doe"
+                      }
+                    }
+                    """)
+        );
 
         RunContext runContext = runContextFactory.of();
 
@@ -90,8 +94,13 @@ class GetTest {
         assertThat(uri, notNullValue());
 
         List<Map<String, Object>> stored = new ArrayList<>();
-        try (BufferedReader reader = new BufferedReader(new InputStreamReader(
-            storageInterface.get(TenantService.MAIN_TENANT, null, uri)))) {
+        try (
+            BufferedReader reader = new BufferedReader(
+                new InputStreamReader(
+                    storageInterface.get(TenantService.MAIN_TENANT, null, uri)
+                )
+            )
+        ) {
             FileSerde.reader(reader, value -> stored.add((Map<String, Object>) value));
         }
 
