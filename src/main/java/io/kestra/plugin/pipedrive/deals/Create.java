@@ -21,6 +21,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
+import io.kestra.core.models.annotations.PluginProperty;
 
 @SuperBuilder
 @ToString
@@ -76,71 +77,83 @@ public class Create extends AbstractPipedriveTask implements RunnableTask<Create
         title = "Deal title"
     )
     @NotNull
+    @PluginProperty(group = "main")
     private Property<String> title;
 
     @Schema(
         title = "Deal value"
     )
+    @PluginProperty(group = "advanced")
     private Property<BigDecimal> value;
 
     @Schema(
         title = "Currency",
         description = "Currency code (e.g., USD, EUR, GBP)"
     )
+    @PluginProperty(group = "advanced")
     private Property<String> currency;
 
     @Schema(
         title = "Person ID",
         description = "ID of the person this deal is associated with"
     )
+    @PluginProperty(group = "advanced")
     private Property<Integer> personId;
 
     @Schema(
         title = "Organization ID",
         description = "ID of the organization this deal is associated with"
     )
+    @PluginProperty(group = "advanced")
     private Property<Integer> orgId;
 
     @Schema(
         title = "User ID",
         description = "ID of the user who will be marked as the owner of this deal"
     )
+    @PluginProperty(group = "advanced")
     private Property<Integer> userId;
 
     @Schema(
         title = "Stage ID",
         description = "ID of the stage this deal will be placed in a pipeline"
     )
+    @PluginProperty(group = "advanced")
     private Property<Integer> stageId;
 
     @Schema(
         title = "Status",
         description = "Status of the deal. Valid values: 'open', 'won', 'lost', 'deleted'"
     )
+    @PluginProperty(group = "advanced")
     private Property<String> status;
 
     @Schema(
         title = "Expected close date",
         description = "Expected close date in YYYY-MM-DD format"
     )
+    @PluginProperty(group = "advanced")
     private Property<String> expectedCloseDate;
 
     @Schema(
         title = "Probability",
         description = "Deal success probability percentage (0-100)"
     )
+    @PluginProperty(group = "advanced")
     private Property<Double> probability;
 
     @Schema(
         title = "Visibility",
         description = "Visibility of the deal. Valid values: '1' (owner only), '3' (entire company), or '5' (owner and followers)"
     )
+    @PluginProperty(group = "destination")
     private Property<String> visibleTo;
 
     @Schema(
         title = "Custom fields",
         description = "Map of custom field keys and values"
     )
+    @PluginProperty(group = "destination")
     private Property<Map<String, Object>> customFields;
 
     @Override

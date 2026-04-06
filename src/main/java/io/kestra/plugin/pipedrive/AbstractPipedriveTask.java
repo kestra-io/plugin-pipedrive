@@ -15,6 +15,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
+import io.kestra.core.models.annotations.PluginProperty;
 
 /**
  * Shared configuration and utilities for Pipedrive tasks.
@@ -30,6 +31,7 @@ public abstract class AbstractPipedriveTask extends Task {
         description = "Your Pipedrive API token for authentication."
     )
     @NotNull
+    @PluginProperty(group = "main")
     protected Property<String> apiToken;
 
     @Schema(
@@ -38,6 +40,7 @@ public abstract class AbstractPipedriveTask extends Task {
     )
     @NotNull
     @Builder.Default
+    @PluginProperty(group = "main")
     protected Property<String> apiUrl = Property.ofValue(PipedriveClient.DEFAULT_BASE_URL);
 
     protected String renderApiToken(RunContext runContext) throws IllegalArgumentException, IllegalVariableEvaluationException {
