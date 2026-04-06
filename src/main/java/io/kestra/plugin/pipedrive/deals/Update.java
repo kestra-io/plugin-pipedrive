@@ -25,6 +25,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
+import io.kestra.core.models.annotations.PluginProperty;
 
 @SuperBuilder
 @ToString
@@ -76,54 +77,63 @@ public class Update extends AbstractPipedriveTask implements RunnableTask<Update
         title = "Deal ID"
     )
     @NotNull
+    @PluginProperty(group = "main")
     private Property<Integer> dealId;
 
     @Schema(
         title = "Deal title",
         description = "New title for the deal"
     )
+    @PluginProperty(group = "advanced")
     private Property<String> title;
 
     @Schema(
         title = "Deal value",
         description = "New value for the deal"
     )
+    @PluginProperty(group = "advanced")
     private Property<BigDecimal> value;
 
     @Schema(
         title = "Stage ID",
         description = "New stage ID for the deal"
     )
+    @PluginProperty(group = "advanced")
     private Property<Integer> stageId;
 
     @Schema(
         title = "Status",
         description = "New status for the deal. Valid values: 'open', 'won', 'lost'"
     )
+    @PluginProperty(group = "advanced")
     private Property<String> status;
 
     @Schema(
         title = "Expected close date",
         description = "New expected close date in YYYY-MM-DD format"
     )
+    @PluginProperty(group = "advanced")
     private Property<String> expectedCloseDate;
 
     @Schema(
         title = "Probability",
         description = "New deal success probability percentage (0-100)"
     )
+    @PluginProperty(group = "advanced")
     private Property<Double> probability;
 
     @Schema(
         title = "Lost reason",
         description = "Reason for losing the deal (if status is 'lost')"
     )
+    @PluginProperty(group = "advanced")
     private Property<String> lostReason;
 
     @Schema(
         title = "Custom fields",
         description = "Map of custom field keys and values to update"
     )
+    @PluginProperty(group = "destination")
     private Property<Map<String, Object>> customFields;
 
     @Override

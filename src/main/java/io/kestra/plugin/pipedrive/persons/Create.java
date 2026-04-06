@@ -22,6 +22,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
+import io.kestra.core.models.annotations.PluginProperty;
 
 @SuperBuilder
 @ToString
@@ -82,42 +83,49 @@ public class Create extends AbstractPipedriveTask implements RunnableTask<Create
         description = "Full name of the person"
     )
     @NotNull
+    @PluginProperty(group = "main")
     private Property<String> name;
 
     @Schema(
         title = "Organization ID",
         description = "ID of the organization this person belongs to"
     )
+    @PluginProperty(group = "advanced")
     private Property<Integer> orgId;
 
     @Schema(
         title = "Owner ID",
         description = "ID of the user who will be marked as the owner of this person"
     )
+    @PluginProperty(group = "advanced")
     private Property<Integer> ownerId;
 
     @Schema(
         title = "Email addresses",
         description = "List of email addresses for this person"
     )
+    @PluginProperty(group = "advanced")
     private Property<List<Map<String, Object>>> emails;
 
     @Schema(
         title = "Phone numbers",
         description = "List of phone numbers for this person"
     )
+    @PluginProperty(group = "advanced")
     private Property<List<Map<String, Object>>> phones;
 
     @Schema(
         title = "Visibility",
         description = "Visibility of the person. Valid values: '1' (owner only), '3' (entire company), or '5' (owner and followers)"
     )
+    @PluginProperty(group = "destination")
     private Property<String> visibleTo;
 
     @Schema(
         title = "Custom fields",
         description = "Map of custom field keys and values"
     )
+    @PluginProperty(group = "destination")
     private Property<Map<String, Object>> customFields;
 
     @Override

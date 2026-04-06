@@ -29,6 +29,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
+import io.kestra.core.models.annotations.PluginProperty;
 
 @SuperBuilder
 @ToString
@@ -64,6 +65,7 @@ public class Get extends AbstractPipedriveTask implements RunnableTask<Get.Outpu
         description = "The ID of the person to retrieve"
     )
     @NotNull
+    @PluginProperty(group = "main")
     private Property<Integer> personId;
 
     @Schema(
@@ -72,6 +74,7 @@ public class Get extends AbstractPipedriveTask implements RunnableTask<Get.Outpu
     )
     @NotNull
     @Builder.Default
+    @PluginProperty(group = "processing")
     private Property<FetchType> fetchType = Property.ofValue(FetchType.FETCH_ONE);
 
     @Override
