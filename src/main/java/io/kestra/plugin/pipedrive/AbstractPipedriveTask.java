@@ -31,7 +31,7 @@ public abstract class AbstractPipedriveTask extends Task {
         description = "Your Pipedrive API token for authentication."
     )
     @NotNull
-    @PluginProperty(group = "main")
+    @PluginProperty(group = "main", secret = true)
     protected Property<String> apiToken;
 
     @Schema(
