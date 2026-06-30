@@ -28,6 +28,7 @@ import okhttp3.mockwebserver.RecordedRequest;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.notNullValue;
 
 @KestraTest
@@ -88,7 +89,9 @@ class GetTest {
 
         RecordedRequest recordedRequest = mockWebServer.takeRequest();
         assertThat(recordedRequest.getMethod(), is("GET"));
-        assertThat(recordedRequest.getPath(), containsString("/persons/12?api_token=token"));
+        assertThat(recordedRequest.getPath(), is("/v2/persons/12"));
+        assertThat(recordedRequest.getPath(), not(containsString("api_token")));
+        assertThat(recordedRequest.getHeader("Authorization"), is("Bearer token"));
 
         URI uri = output.getUri();
         assertThat(uri, notNullValue());

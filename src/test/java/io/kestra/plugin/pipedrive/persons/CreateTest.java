@@ -21,6 +21,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.not;
 
 @KestraTest
 class CreateTest {
@@ -95,7 +96,9 @@ class CreateTest {
         String body = recordedRequest.getBody().readUtf8();
 
         assertThat(recordedRequest.getMethod(), is("POST"));
-        assertThat(recordedRequest.getPath(), containsString("/persons?api_token=token"));
+        assertThat(recordedRequest.getPath(), is("/v2/persons"));
+        assertThat(recordedRequest.getPath(), not(containsString("api_token")));
+        assertThat(recordedRequest.getHeader("Authorization"), is("Bearer token"));
         assertThat(
             body, allOf(
                 containsString("Jane Doe"),

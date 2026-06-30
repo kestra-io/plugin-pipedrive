@@ -32,6 +32,7 @@ public abstract class AbstractPipedriveTask extends Task {
     )
     @NotNull
     @PluginProperty(group = "main", secret = true)
+    @ToString.Exclude
     protected Property<String> apiToken;
 
     @Schema(
