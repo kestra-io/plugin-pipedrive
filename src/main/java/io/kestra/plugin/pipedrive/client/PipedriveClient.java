@@ -59,6 +59,7 @@ public class PipedriveClient implements Closeable {
         HttpRequest request = HttpRequest.builder()
             .uri(URI.create(url))
             .method("GET")
+            .headers(authHeaders())
             .build();
 
         return executeRequest(request, typeRef);
@@ -71,7 +72,7 @@ public class PipedriveClient implements Closeable {
         HttpRequest request = HttpRequest.builder()
             .uri(URI.create(url))
             .method("POST")
-            .headers(HttpHeaders.of(Map.of("Content-Type", List.of("application/json")), (s1, s2) -> true))
+            .headers(HttpHeaders.of(mergeHeaders(Map.of("Content-Type", List.of("application/json"))), (s1, s2) -> true))
             .body(
                 HttpRequest.StringRequestBody.builder()
                     .contentType("application/json")
@@ -91,7 +92,7 @@ public class PipedriveClient implements Closeable {
         HttpRequest request = HttpRequest.builder()
             .uri(URI.create(url))
             .method("PUT")
-            .headers(HttpHeaders.of(Map.of("Content-Type", List.of("application/json")), (s1, s2) -> true))
+            .headers(HttpHeaders.of(mergeHeaders(Map.of("Content-Type", List.of("application/json"))), (s1, s2) -> true))
             .body(
                 HttpRequest.StringRequestBody.builder()
                     .contentType("application/json")
@@ -110,13 +111,24 @@ public class PipedriveClient implements Closeable {
         HttpRequest request = HttpRequest.builder()
             .uri(URI.create(url))
             .method("DELETE")
+            .headers(authHeaders())
             .build();
 
         return executeRequest(request, typeRef);
     }
 
+    private HttpHeaders authHeaders() {
+        return HttpHeaders.of(Map.of("x-api-token", List.of(apiToken)), (s1, s2) -> true);
+    }
+
+    private Map<String, List<String>> mergeHeaders(Map<String, List<String>> extra) {
+        Map<String, List<String>> merged = new java.util.HashMap<>(extra);
+        merged.put("x-api-token", List.of(apiToken));
+        return merged;
+    }
+
     private <T> PipedriveResponse<T> executeRequest(HttpRequest request, TypeReference<PipedriveResponse<T>> typeRef) throws IOException {
-        logger.debug("Executing Pipedrive API request: {} {}", request.getMethod(), request.getUri());
+        logger.debug("Executing Pipedrive API request: {} {}", request.getMethod(), request.getUri().getPath());
 
         try {
             HttpResponse<String> response = httpClient.request(request, String.class);
@@ -142,8 +154,7 @@ public class PipedriveClient implements Closeable {
     }
 
     private String buildUrl(String endpoint) {
-        String separator = endpoint.contains("?") ? "&" : "?";
-        return baseUrl + endpoint + separator + "api_token=" + apiToken;
+        return baseUrl + endpoint;
     }
 
     @Override

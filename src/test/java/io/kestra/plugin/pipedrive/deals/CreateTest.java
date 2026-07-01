@@ -20,6 +20,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.not;
 
 @KestraTest
 class CreateTest {
@@ -79,7 +80,9 @@ class CreateTest {
         String body = recordedRequest.getBody().readUtf8();
 
         assertThat(recordedRequest.getMethod(), is("POST"));
-        assertThat(recordedRequest.getPath(), containsString("/deals?api_token=token"));
+        assertThat(recordedRequest.getPath(), is("/v2/deals"));
+        assertThat(recordedRequest.getPath(), not(containsString("api_token")));
+        assertThat(recordedRequest.getHeader("x-api-token"), is("token"));
         assertThat(body, allOf(containsString("Test Deal"), containsString("EUR"), containsString("stage_id")));
 
         assertThat(output.getDealId(), is(321));
