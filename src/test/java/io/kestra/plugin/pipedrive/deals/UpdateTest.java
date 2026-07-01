@@ -80,7 +80,7 @@ class UpdateTest {
         assertThat(recordedRequest.getMethod(), is("PUT"));
         assertThat(recordedRequest.getPath(), is("/v2/deals/987"));
         assertThat(recordedRequest.getPath(), not(containsString("api_token")));
-        assertThat(recordedRequest.getHeader("Authorization"), is("Bearer token"));
+        assertThat(recordedRequest.getHeader("x-api-token"), is("token"));
         assertThat(body, containsString("won"));
         assertThat(body, containsString("25000"));
 

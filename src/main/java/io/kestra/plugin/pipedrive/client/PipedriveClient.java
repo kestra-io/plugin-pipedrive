@@ -118,12 +118,12 @@ public class PipedriveClient implements Closeable {
     }
 
     private HttpHeaders authHeaders() {
-        return HttpHeaders.of(Map.of("Authorization", List.of("Bearer " + apiToken)), (s1, s2) -> true);
+        return HttpHeaders.of(Map.of("x-api-token", List.of(apiToken)), (s1, s2) -> true);
     }
 
     private Map<String, List<String>> mergeHeaders(Map<String, List<String>> extra) {
         Map<String, List<String>> merged = new java.util.HashMap<>(extra);
-        merged.put("Authorization", List.of("Bearer " + apiToken));
+        merged.put("x-api-token", List.of(apiToken));
         return merged;
     }
 

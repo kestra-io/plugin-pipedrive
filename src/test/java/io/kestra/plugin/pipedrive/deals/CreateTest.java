@@ -82,7 +82,7 @@ class CreateTest {
         assertThat(recordedRequest.getMethod(), is("POST"));
         assertThat(recordedRequest.getPath(), is("/v2/deals"));
         assertThat(recordedRequest.getPath(), not(containsString("api_token")));
-        assertThat(recordedRequest.getHeader("Authorization"), is("Bearer token"));
+        assertThat(recordedRequest.getHeader("x-api-token"), is("token"));
         assertThat(body, allOf(containsString("Test Deal"), containsString("EUR"), containsString("stage_id")));
 
         assertThat(output.getDealId(), is(321));

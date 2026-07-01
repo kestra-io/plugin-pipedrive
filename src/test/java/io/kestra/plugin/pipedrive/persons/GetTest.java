@@ -91,7 +91,7 @@ class GetTest {
         assertThat(recordedRequest.getMethod(), is("GET"));
         assertThat(recordedRequest.getPath(), is("/v2/persons/12"));
         assertThat(recordedRequest.getPath(), not(containsString("api_token")));
-        assertThat(recordedRequest.getHeader("Authorization"), is("Bearer token"));
+        assertThat(recordedRequest.getHeader("x-api-token"), is("token"));
 
         URI uri = output.getUri();
         assertThat(uri, notNullValue());
