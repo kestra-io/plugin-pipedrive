@@ -74,7 +74,6 @@ class DeleteTest {
         assertThat(recordedRequest.getPath(), not(containsString("api_token")));
         assertThat(recordedRequest.getHeader("x-api-token"), is("token"));
 
-        assertThat(output.getId(), is(123));
         assertThat(output.getDeleted(), is(true));
     }
 

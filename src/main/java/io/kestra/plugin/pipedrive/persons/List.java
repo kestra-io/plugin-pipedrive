@@ -86,7 +86,7 @@ public class List extends AbstractPipedriveTask implements RunnableTask<List.Out
 
     @Schema(
         title = "Limit",
-        description = "Maximum number of persons to return in a single page"
+        description = "Maximum number of persons to return in a single page. If left unset, the Pipedrive API defaults to 100, up to a maximum of 500."
     )
     @PluginProperty(group = "processing")
     private Property<Integer> limit;

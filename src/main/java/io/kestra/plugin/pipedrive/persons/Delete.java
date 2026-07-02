@@ -90,7 +90,6 @@ public class Delete extends AbstractPipedriveTask implements RunnableTask<Delete
             logger.info("Successfully deleted person with ID: {}", rPersonId);
 
             return Output.builder()
-                .id(rPersonId)
                 // always true here: a failed deletion throws above instead of returning
                 .deleted(true)
                 .build();
@@ -100,9 +99,6 @@ public class Delete extends AbstractPipedriveTask implements RunnableTask<Delete
     @Builder
     @Getter
     public static class Output implements io.kestra.core.models.tasks.Output {
-        @Schema(title = "Person ID", description = "The ID of the deleted person")
-        private final Integer id;
-
         @Schema(title = "Deleted", description = "Whether the person was successfully deleted")
         private final Boolean deleted;
     }

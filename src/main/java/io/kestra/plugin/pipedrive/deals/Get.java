@@ -4,7 +4,6 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.net.URI;
-import java.util.List;
 
 import org.slf4j.Logger;
 
@@ -112,25 +111,15 @@ public class Get extends AbstractPipedriveTask implements RunnableTask<Get.Outpu
                 case STORE -> {
                     File tempFile = runContext.workingDir().createTempFile(".ion").toFile();
                     try (BufferedWriter output = new BufferedWriter(new FileWriter(tempFile), FileSerde.BUFFER_SIZE)) {
-                        Long count = FileSerde.writeAll(output, Flux.just(deal)).block();
+                        FileSerde.writeAll(output, Flux.just(deal)).block();
                         URI uri = runContext.storage().putFile(tempFile);
                         yield Output.builder()
                             .uri(uri)
-                            .count(count != null ? count.intValue() : 0)
                             .build();
                     }
                 }
-                case FETCH -> Output.builder()
-                    .deals(List.of(deal))
-                    .count(1)
-                    .build();
-                case FETCH_ONE -> Output.builder()
-                    .deal(deal)
-                    .count(1)
-                    .build();
                 default -> Output.builder()
                     .deal(deal)
-                    .count(1)
                     .build();
             };
         }
@@ -139,16 +128,10 @@ public class Get extends AbstractPipedriveTask implements RunnableTask<Get.Outpu
     @Builder
     @Getter
     public static class Output implements io.kestra.core.models.tasks.Output {
-        @Schema(title = "Deal", description = "The retrieved deal")
+        @Schema(title = "Deal", description = "The retrieved deal, when fetchType is not STORE")
         private final Deal deal;
-
-        @Schema(title = "Deals", description = "List of retrieved deals when fetchType is FETCH")
-        private final List<Deal> deals;
 
         @Schema(title = "URI", description = "Stored deal location when fetchType is STORE")
         private final URI uri;
-
-        @Schema(title = "Count", description = "Number of deals retrieved or stored")
-        private final Integer count;
     }
 }

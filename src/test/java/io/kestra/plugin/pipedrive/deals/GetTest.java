@@ -107,7 +107,6 @@ class GetTest {
         }
 
         assertThat(stored.getFirst().get("id"), is(321));
-        assertThat(output.getCount(), is(1));
     }
 
     @Test
@@ -140,7 +139,6 @@ class GetTest {
 
         assertThat(output.getDeal().getId(), is(321));
         assertThat(output.getDeal().getTitle(), is("Enterprise Software License"));
-        assertThat(output.getCount(), is(1));
     }
 
     @Test

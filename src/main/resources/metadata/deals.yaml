@@ -2,7 +2,7 @@ group: io.kestra.plugin.pipedrive.deals
 name: "pipedrive-deals"
 title: "Pipedrive Deals"
 description: "Tasks that create, retrieve, update, list, and delete deals in Pipedrive."
-body: "Provide the Pipedrive `apiToken` along with deal fields such as `title`, `value`, `currency`, and pipeline/stage IDs to insert, fetch, filter, or modify deals and capture the returned deal payload for further automation. Deleting a deal only soft-deletes it in Pipedrive; use `Update` with `status: WON` or `status: LOST` for the normal close-out workflow instead."
+body: "Provide the Pipedrive `apiToken` along with deal fields such as `title`, `value`, `currency`, and pipeline/stage IDs to insert, fetch, filter, or modify deals and capture the returned deal payload for further automation. Deleting a deal only soft-deletes it in Pipedrive; use `Update` with `status: 'won'` or `status: 'lost'` for the normal close-out workflow instead."
 videos: []
 createdBy: "Kestra Core Team"
 managedBy: "Kestra Core Team"

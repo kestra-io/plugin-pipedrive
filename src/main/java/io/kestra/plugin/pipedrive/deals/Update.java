@@ -66,7 +66,7 @@ import lombok.experimental.SuperBuilder;
                     type: io.kestra.plugin.pipedrive.deals.Update
                     apiToken: "{{ secret('PIPEDRIVE_API_TOKEN') }}"
                     dealId: 123
-                    status: WON
+                    status: "won"
                 """
         )
     }
@@ -103,10 +103,10 @@ public class Update extends AbstractPipedriveTask implements RunnableTask<Update
 
     @Schema(
         title = "Status",
-        description = "New status for the deal. Valid values: OPEN, WON, LOST"
+        description = "New status for the deal. Valid values: 'open', 'won', 'lost'"
     )
     @PluginProperty(group = "advanced")
-    private Property<DealStatus> status;
+    private Property<String> status;
 
     @Schema(
         title = "Expected close date",
@@ -156,7 +156,7 @@ public class Update extends AbstractPipedriveTask implements RunnableTask<Update
         String rTitle = title == null ? null : runContext.render(title).as(String.class).orElse(null);
         BigDecimal rValue = value == null ? null : runContext.render(value).as(BigDecimal.class).orElse(null);
         Integer rStageId = stageId == null ? null : runContext.render(stageId).as(Integer.class).orElse(null);
-        String rStatus = status == null ? null : runContext.render(status).as(DealStatus.class).map(DealStatus::toString).orElse(null);
+        String rStatus = status == null ? null : runContext.render(status).as(String.class).orElse(null);
         String rExpectedCloseDate = expectedCloseDate == null ? null : runContext.render(expectedCloseDate).as(String.class).orElse(null);
         Double rProbability = probability == null ? null : runContext.render(probability).as(Double.class).orElse(null);
         String rLostReason = lostReason == null ? null : runContext.render(lostReason).as(String.class).orElse(null);

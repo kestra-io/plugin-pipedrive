@@ -56,7 +56,7 @@ import reactor.core.publisher.Flux;
                     type: io.kestra.plugin.pipedrive.deals.List
                     apiToken: "{{ secret('PIPEDRIVE_API_TOKEN') }}"
                     pipelineId: 1
-                    status: OPEN
+                    status: "open"
                     limit: 100
                 """
         )
@@ -101,10 +101,10 @@ public class List extends AbstractPipedriveTask implements RunnableTask<List.Out
 
     @Schema(
         title = "Status",
-        description = "Only return deals with this status. Valid values: OPEN, WON, LOST, DELETED"
+        description = "Only return deals with this status. Valid values: 'open', 'won', 'lost', 'deleted'"
     )
     @PluginProperty(group = "processing")
-    private Property<DealStatus> status;
+    private Property<String> status;
 
     @Schema(
         title = "Owner ID",
@@ -115,7 +115,7 @@ public class List extends AbstractPipedriveTask implements RunnableTask<List.Out
 
     @Schema(
         title = "Limit",
-        description = "Maximum number of deals to return in a single page"
+        description = "Maximum number of deals to return in a single page. If left unset, the Pipedrive API defaults to 100, up to a maximum of 500."
     )
     @PluginProperty(group = "processing")
     private Property<Integer> limit;
@@ -165,7 +165,7 @@ public class List extends AbstractPipedriveTask implements RunnableTask<List.Out
             runContext.render(stageId).as(Integer.class).ifPresent(v -> queryParams.put("stage_id", String.valueOf(v)));
         }
         if (status != null) {
-            runContext.render(status).as(DealStatus.class).ifPresent(v -> queryParams.put("status", v.toString()));
+            runContext.render(status).as(String.class).ifPresent(v -> queryParams.put("status", v));
         }
         if (ownerId != null) {
             runContext.render(ownerId).as(Integer.class).ifPresent(v -> queryParams.put("owner_id", String.valueOf(v)));
