@@ -87,13 +87,14 @@ public class Delete extends AbstractPipedriveTask implements RunnableTask<Delete
             );
 
             if (!Boolean.TRUE.equals(response.getSuccess())) {
-                throw new IllegalStateException("Failed to delete deal with ID " + rDealId);
+                throw new IllegalStateException("Failed to delete deal with ID " + rDealId + ": " + response.getError());
             }
 
             logger.info("Successfully deleted deal with ID: {}", rDealId);
 
             return Output.builder()
                 .id(rDealId)
+                // always true here: a failed deletion throws above instead of returning
                 .deleted(true)
                 .build();
         }

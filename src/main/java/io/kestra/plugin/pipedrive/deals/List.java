@@ -5,7 +5,6 @@ import java.io.File;
 import java.io.FileWriter;
 import java.net.URI;
 import java.util.LinkedHashMap;
-import java.util.Map;
 
 import org.slf4j.Logger;
 
@@ -24,6 +23,7 @@ import io.kestra.plugin.pipedrive.models.Deal;
 import io.kestra.plugin.pipedrive.models.PipedriveResponse;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -131,6 +131,7 @@ public class List extends AbstractPipedriveTask implements RunnableTask<List.Out
         title = "Fetch strategy",
         description = "How to return the fetched deals. Valid values: 'FETCH' (as a list of objects) or 'STORE' (to internal storage). Defaults to 'FETCH'."
     )
+    @NotNull
     @Builder.Default
     @PluginProperty(group = "processing")
     private Property<FetchType> fetchType = Property.ofValue(FetchType.FETCH);
@@ -147,7 +148,7 @@ public class List extends AbstractPipedriveTask implements RunnableTask<List.Out
             throw new IllegalArgumentException("fetchType must be either FETCH or STORE for a list operation");
         }
 
-        Map<String, String> queryParams = new LinkedHashMap<>();
+        var queryParams = new LinkedHashMap<String, String>();
         if (filterId != null) {
             runContext.render(filterId).as(Integer.class).ifPresent(v -> queryParams.put("filter_id", String.valueOf(v)));
         }

@@ -100,6 +100,7 @@ class DeleteTest {
             .dealId(Property.ofValue(999))
             .build();
 
-        assertThrows(IllegalStateException.class, () -> task.run(runContext));
+        IllegalStateException exception = assertThrows(IllegalStateException.class, () -> task.run(runContext));
+        assertThat(exception.getMessage(), containsString("Deal not found"));
     }
 }

@@ -84,13 +84,14 @@ public class Delete extends AbstractPipedriveTask implements RunnableTask<Delete
             );
 
             if (!Boolean.TRUE.equals(response.getSuccess())) {
-                throw new IllegalStateException("Failed to delete person with ID " + rPersonId);
+                throw new IllegalStateException("Failed to delete person with ID " + rPersonId + ": " + response.getError());
             }
 
             logger.info("Successfully deleted person with ID: {}", rPersonId);
 
             return Output.builder()
                 .id(rPersonId)
+                // always true here: a failed deletion throws above instead of returning
                 .deleted(true)
                 .build();
         }
