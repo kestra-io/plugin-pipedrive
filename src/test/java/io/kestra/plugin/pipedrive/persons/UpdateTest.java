@@ -85,7 +85,7 @@ class UpdateTest {
         RecordedRequest recordedRequest = mockWebServer.takeRequest();
         String body = recordedRequest.getBody().readUtf8();
 
-        assertThat(recordedRequest.getMethod(), is("PUT"));
+        assertThat(recordedRequest.getMethod(), is("PATCH"));
         assertThat(recordedRequest.getPath(), is("/v2/persons/55"));
         assertThat(recordedRequest.getPath(), not(containsString("api_token")));
         assertThat(recordedRequest.getHeader("x-api-token"), is("token"));

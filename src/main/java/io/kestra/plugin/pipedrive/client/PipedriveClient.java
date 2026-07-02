@@ -91,13 +91,13 @@ public class PipedriveClient implements Closeable {
         return executeRequest(request, typeRef);
     }
 
-    public <T> PipedriveResponse<T> put(String endpoint, Object body, TypeReference<PipedriveResponse<T>> typeRef) throws IOException {
+    public <T> PipedriveResponse<T> patch(String endpoint, Object body, TypeReference<PipedriveResponse<T>> typeRef) throws IOException {
         String url = buildUrl(endpoint);
         String jsonBody = objectMapper.writeValueAsString(body);
 
         HttpRequest request = HttpRequest.builder()
             .uri(URI.create(url))
-            .method("PUT")
+            .method("PATCH")
             .headers(HttpHeaders.of(mergeHeaders(Map.of("Content-Type", List.of("application/json"))), (s1, s2) -> true))
             .body(
                 HttpRequest.StringRequestBody.builder()

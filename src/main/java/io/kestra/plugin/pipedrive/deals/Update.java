@@ -201,7 +201,7 @@ public class Update extends AbstractPipedriveTask implements RunnableTask<Update
 
             logger.info("Updating Pipedrive deal with ID: {}", rDealId);
 
-            PipedriveResponse<Deal> response = client.put(
+            PipedriveResponse<Deal> response = client.patch(
                 "/deals/" + rDealId, deal,
                 new TypeReference<>() {
                 }
