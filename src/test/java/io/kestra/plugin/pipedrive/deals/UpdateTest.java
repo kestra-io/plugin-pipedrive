@@ -68,7 +68,7 @@ class UpdateTest {
             .apiToken(Property.ofValue("token"))
             .apiUrl(Property.ofValue(baseUrl()))
             .dealId(Property.ofValue(987))
-            .status(Property.ofValue("won"))
+            .status(Property.ofValue(DealStatus.WON))
             .value(Property.ofValue(BigDecimal.valueOf(25000)))
             .build();
 

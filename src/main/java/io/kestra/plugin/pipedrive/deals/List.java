@@ -12,6 +12,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 
 import io.kestra.core.models.annotations.Example;
 import io.kestra.core.models.annotations.Plugin;
+import io.kestra.core.models.annotations.PluginProperty;
 import io.kestra.core.models.property.Property;
 import io.kestra.core.models.tasks.RunnableTask;
 import io.kestra.core.models.tasks.common.FetchType;
@@ -30,7 +31,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
-import io.kestra.core.models.annotations.PluginProperty;
 import reactor.core.publisher.Flux;
 
 @SuperBuilder
@@ -56,7 +56,7 @@ import reactor.core.publisher.Flux;
                     type: io.kestra.plugin.pipedrive.deals.List
                     apiToken: "{{ secret('PIPEDRIVE_API_TOKEN') }}"
                     pipelineId: 1
-                    status: "open"
+                    status: OPEN
                     limit: 100
                 """
         )
@@ -101,10 +101,10 @@ public class List extends AbstractPipedriveTask implements RunnableTask<List.Out
 
     @Schema(
         title = "Status",
-        description = "Only return deals with this status. Valid values: 'open', 'won', 'lost', 'deleted'"
+        description = "Only return deals with this status. Valid values: OPEN, WON, LOST, DELETED"
     )
     @PluginProperty(group = "processing")
-    private Property<String> status;
+    private Property<DealStatus> status;
 
     @Schema(
         title = "Owner ID",
@@ -165,7 +165,7 @@ public class List extends AbstractPipedriveTask implements RunnableTask<List.Out
             runContext.render(stageId).as(Integer.class).ifPresent(v -> queryParams.put("stage_id", String.valueOf(v)));
         }
         if (status != null) {
-            runContext.render(status).as(String.class).ifPresent(v -> queryParams.put("status", v));
+            runContext.render(status).as(DealStatus.class).ifPresent(v -> queryParams.put("status", v.toString()));
         }
         if (ownerId != null) {
             runContext.render(ownerId).as(Integer.class).ifPresent(v -> queryParams.put("owner_id", String.valueOf(v)));
@@ -190,7 +190,7 @@ public class List extends AbstractPipedriveTask implements RunnableTask<List.Out
                 throw new IllegalStateException("Failed to list deals: " + response.getError());
             }
 
-            var deals = response.getData() != null ? response.getData() : java.util.List.<Deal>of();
+            var deals = response.getData() != null ? response.getData() : java.util.List.<Deal> of();
             var rNextCursor = response.getAdditionalData() != null ? response.getAdditionalData().getNextCursor() : null;
 
             logger.info("Successfully listed {} deal(s)", deals.size());
@@ -208,11 +208,12 @@ public class List extends AbstractPipedriveTask implements RunnableTask<List.Out
                             .build();
                     }
                 }
-                default -> Output.builder()
+                case FETCH -> Output.builder()
                     .deals(deals)
                     .count(deals.size())
                     .nextCursor(rNextCursor)
                     .build();
+                default -> throw new IllegalStateException("Unexpected fetch type: " + rFetchType);
             };
         }
     }

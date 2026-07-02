@@ -107,4 +107,31 @@ class UpdateTest {
 
         assertThrows(IllegalArgumentException.class, () -> task.run(runContext));
     }
+
+    @Test
+    void shouldThrowWhenUpdateFails() {
+        mockWebServer.enqueue(
+            new MockResponse()
+                .setResponseCode(200)
+                .setHeader("Content-Type", "application/json")
+                .setBody("""
+                    {
+                      "success": false,
+                      "error": "Person not found"
+                    }
+                    """)
+        );
+
+        RunContext runContext = runContextFactory.of();
+
+        Update task = Update.builder()
+            .apiToken(Property.ofValue("token"))
+            .apiUrl(Property.ofValue(baseUrl()))
+            .personId(Property.ofValue(999))
+            .orgId(Property.ofValue(42))
+            .build();
+
+        IllegalStateException exception = assertThrows(IllegalStateException.class, () -> task.run(runContext));
+        assertThat(exception.getMessage(), containsString("Person not found"));
+    }
 }

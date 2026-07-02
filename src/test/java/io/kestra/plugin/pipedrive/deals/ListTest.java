@@ -83,7 +83,7 @@ class ListTest {
             .apiToken(Property.ofValue("token"))
             .apiUrl(Property.ofValue(baseUrl()))
             .pipelineId(Property.ofValue(1))
-            .status(Property.ofValue("open"))
+            .status(Property.ofValue(DealStatus.OPEN))
             .limit(Property.ofValue(50))
             .build();
 
