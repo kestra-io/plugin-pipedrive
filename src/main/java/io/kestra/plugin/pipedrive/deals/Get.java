@@ -1,9 +1,9 @@
-package io.kestra.plugin.pipedrive.persons;
+package io.kestra.plugin.pipedrive.deals;
 
 import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileWriter;
 import java.net.URI;
-import java.util.List;
 
 import org.slf4j.Logger;
 
@@ -19,7 +19,7 @@ import io.kestra.core.runners.RunContext;
 import io.kestra.core.serializers.FileSerde;
 import io.kestra.plugin.pipedrive.AbstractPipedriveTask;
 import io.kestra.plugin.pipedrive.client.PipedriveClient;
-import io.kestra.plugin.pipedrive.models.Person;
+import io.kestra.plugin.pipedrive.models.Deal;
 import io.kestra.plugin.pipedrive.models.PipedriveResponse;
 
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -30,6 +30,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
+import reactor.core.publisher.Flux;
 
 @SuperBuilder
 @ToString
@@ -37,23 +38,23 @@ import lombok.experimental.SuperBuilder;
 @Getter
 @NoArgsConstructor
 @Schema(
-    title = "Get a person from Pipedrive CRM",
-    description = "Retrieves detailed information about a specific person from Pipedrive by their ID."
+    title = "Get a deal from Pipedrive CRM",
+    description = "Retrieves detailed information about a specific deal from Pipedrive by its ID."
 )
 @Plugin(
     examples = {
         @Example(
-            title = "Get a person by ID",
+            title = "Get a deal by ID",
             full = true,
             code = """
-                id: pipedrive_get_person
+                id: pipedrive_get_deal
                 namespace: company.team
 
                 tasks:
-                  - id: get_person
-                    type: io.kestra.plugin.pipedrive.persons.Get
+                  - id: get_deal
+                    type: io.kestra.plugin.pipedrive.deals.Get
                     apiToken: "{{ secret('PIPEDRIVE_API_TOKEN') }}"
-                    personId: 123
+                    dealId: 123
                 """
         )
     }
@@ -61,16 +62,16 @@ import lombok.experimental.SuperBuilder;
 public class Get extends AbstractPipedriveTask implements RunnableTask<Get.Output> {
 
     @Schema(
-        title = "Person ID",
-        description = "The ID of the person to retrieve"
+        title = "Deal ID",
+        description = "The ID of the deal to retrieve"
     )
     @NotNull
     @PluginProperty(group = "main")
-    private Property<Integer> personId;
+    private Property<Integer> dealId;
 
     @Schema(
         title = "Fetch strategy",
-        description = "How to fetch the person data (fetch, fetch one, or store)"
+        description = "How to fetch the deal data (fetch, fetch one, or store)"
     )
     @NotNull
     @Builder.Default
@@ -81,54 +82,44 @@ public class Get extends AbstractPipedriveTask implements RunnableTask<Get.Outpu
     public Output run(RunContext runContext) throws Exception {
         Logger logger = runContext.logger();
 
-        String rApiToken = this.renderApiToken(runContext);
-        String rApiUrl = this.renderApiUrl(runContext);
+        var rApiToken = this.renderApiToken(runContext);
+        var rApiUrl = this.renderApiUrl(runContext);
 
-        Integer rPersonId = runContext.render(this.personId).as(Integer.class)
-            .orElseThrow(() -> new IllegalArgumentException("Person ID is required"));
+        var rDealId = runContext.render(this.dealId).as(Integer.class)
+            .orElseThrow(() -> new IllegalArgumentException("Deal ID is required"));
 
         try (PipedriveClient client = new PipedriveClient(runContext, rApiToken, rApiUrl)) {
-            logger.info("Fetching person with ID: {}", rPersonId);
+            logger.info("Fetching deal with ID: {}", rDealId);
 
-            PipedriveResponse<Person> response = client.get(
-                "/persons/" + rPersonId,
+            PipedriveResponse<Deal> response = client.get(
+                "/deals/" + rDealId,
                 new TypeReference<>() {
                 }
             );
 
             if (!Boolean.TRUE.equals(response.getSuccess())) {
-                throw new IllegalStateException("Failed to get person: " + response.getError());
+                throw new IllegalStateException("Failed to get deal: " + response.getError());
             }
 
-            Person person = response.getData();
+            var deal = response.getData();
 
-            logger.info("Successfully retrieved person: {}", person.getName());
+            logger.info("Successfully retrieved deal: {}", deal.getTitle());
 
-            FetchType rFetchType = runContext.render(this.fetchType).as(FetchType.class).orElse(FetchType.FETCH_ONE);
+            var rFetchType = runContext.render(this.fetchType).as(FetchType.class).orElse(FetchType.FETCH_ONE);
 
             return switch (rFetchType) {
                 case STORE -> {
-                    java.io.File tempFile = runContext.workingDir().createTempFile(".ion").toFile();
+                    File tempFile = runContext.workingDir().createTempFile(".ion").toFile();
                     try (BufferedWriter output = new BufferedWriter(new FileWriter(tempFile), FileSerde.BUFFER_SIZE)) {
-                        Long count = FileSerde.writeAll(output, reactor.core.publisher.Flux.just(person)).block();
+                        FileSerde.writeAll(output, Flux.just(deal)).block();
                         URI uri = runContext.storage().putFile(tempFile);
                         yield Output.builder()
                             .uri(uri)
-                            .count(count != null ? count.intValue() : 0)
                             .build();
                     }
                 }
-                case FETCH -> Output.builder()
-                    .persons(List.of(person))
-                    .count(1)
-                    .build();
-                case FETCH_ONE -> Output.builder()
-                    .person(person)
-                    .count(1)
-                    .build();
                 default -> Output.builder()
-                    .person(person)
-                    .count(1)
+                    .deal(deal)
                     .build();
             };
         }
@@ -137,16 +128,10 @@ public class Get extends AbstractPipedriveTask implements RunnableTask<Get.Outpu
     @Builder
     @Getter
     public static class Output implements io.kestra.core.models.tasks.Output {
-        @Schema(title = "Person", description = "The retrieved person")
-        private final Person person;
+        @Schema(title = "Deal", description = "The retrieved deal, when fetchType is not STORE")
+        private final Deal deal;
 
-        @Schema(title = "Persons", description = "List of retrieved persons when fetchType is FETCH")
-        private final List<Person> persons;
-
-        @Schema(title = "URI", description = "Stored persons location when fetchType is STORE")
+        @Schema(title = "URI", description = "Stored deal location when fetchType is STORE")
         private final URI uri;
-
-        @Schema(title = "Count", description = "Number of persons retrieved or stored")
-        private final Integer count;
     }
 }

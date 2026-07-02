@@ -1,7 +1,5 @@
 package io.kestra.plugin.pipedrive.deals;
 
-import java.math.BigDecimal;
-
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -23,7 +21,7 @@ import static org.hamcrest.Matchers.not;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @KestraTest
-class UpdateTest {
+class DeleteTest {
     @Inject
     private RunContextFactory runContextFactory;
 
@@ -45,7 +43,7 @@ class UpdateTest {
     }
 
     @Test
-    void shouldUpdateDeal() throws Exception {
+    void shouldDeleteDeal() throws Exception {
         mockWebServer.enqueue(
             new MockResponse()
                 .setResponseCode(200)
@@ -54,9 +52,7 @@ class UpdateTest {
                     {
                       "success": true,
                       "data": {
-                        "id": 987,
-                        "status": "won",
-                        "update_time": "2024-02-01T00:00:00Z"
+                        "id": 123
                       }
                     }
                     """)
@@ -64,40 +60,46 @@ class UpdateTest {
 
         RunContext runContext = runContextFactory.of();
 
-        Update task = Update.builder()
+        Delete task = Delete.builder()
             .apiToken(Property.ofValue("token"))
             .apiUrl(Property.ofValue(baseUrl()))
-            .dealId(Property.ofValue(987))
-            .status(Property.ofValue("won"))
-            .value(Property.ofValue(BigDecimal.valueOf(25000)))
+            .dealId(Property.ofValue(123))
             .build();
 
-        Update.Output output = task.run(runContext);
+        Delete.Output output = task.run(runContext);
 
         RecordedRequest recordedRequest = mockWebServer.takeRequest();
-        String body = recordedRequest.getBody().readUtf8();
-
-        assertThat(recordedRequest.getMethod(), is("PATCH"));
-        assertThat(recordedRequest.getPath(), is("/v2/deals/987"));
+        assertThat(recordedRequest.getMethod(), is("DELETE"));
+        assertThat(recordedRequest.getPath(), is("/v2/deals/123"));
         assertThat(recordedRequest.getPath(), not(containsString("api_token")));
         assertThat(recordedRequest.getHeader("x-api-token"), is("token"));
-        assertThat(body, containsString("won"));
-        assertThat(body, containsString("25000"));
 
-        assertThat(output.getDealId(), is(987));
-        assertThat(output.getUpdateTime(), is("2024-02-01T00:00:00Z"));
+        assertThat(output.getDeleted(), is(true));
     }
 
     @Test
-    void shouldRequireAtLeastOneField() {
+    void shouldThrowWhenDeleteFails() {
+        mockWebServer.enqueue(
+            new MockResponse()
+                .setResponseCode(200)
+                .setHeader("Content-Type", "application/json")
+                .setBody("""
+                    {
+                      "success": false,
+                      "error": "Deal not found"
+                    }
+                    """)
+        );
+
         RunContext runContext = runContextFactory.of();
 
-        Update task = Update.builder()
+        Delete task = Delete.builder()
             .apiToken(Property.ofValue("token"))
             .apiUrl(Property.ofValue(baseUrl()))
-            .dealId(Property.ofValue(12))
+            .dealId(Property.ofValue(999))
             .build();
 
-        assertThrows(IllegalArgumentException.class, () -> task.run(runContext));
+        IllegalStateException exception = assertThrows(IllegalStateException.class, () -> task.run(runContext));
+        assertThat(exception.getMessage(), containsString("Deal not found"));
     }
 }

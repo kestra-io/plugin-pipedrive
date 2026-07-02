@@ -46,7 +46,7 @@
 ## What
 
 - Provides plugin components under `io.kestra.plugin.pipedrive`.
-- Includes classes such as `Create`, `Update`, `Deal`, `Person`.
+- Includes classes such as `deals.Create`, `deals.Get`, `deals.Update`, `deals.List`, `deals.Delete`, `persons.Create`, `persons.Get`, `persons.Update`, `persons.List`, `persons.Delete`, `Deal`, `Person`.
 
 ## Documentation
 * Full documentation can be found under: [kestra.io/docs](https://kestra.io/docs)

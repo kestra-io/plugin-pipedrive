@@ -3,10 +3,12 @@ package io.kestra.plugin.pipedrive.client;
 import java.io.Closeable;
 import java.io.IOException;
 import java.net.URI;
+import java.net.URLEncoder;
 import java.net.http.HttpHeaders;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 
@@ -54,7 +56,11 @@ public class PipedriveClient implements Closeable {
     }
 
     public <T> PipedriveResponse<T> get(String endpoint, TypeReference<PipedriveResponse<T>> typeRef) throws IOException {
-        String url = buildUrl(endpoint);
+        return get(endpoint, Map.of(), typeRef);
+    }
+
+    public <T> PipedriveResponse<T> get(String endpoint, Map<String, String> queryParams, TypeReference<PipedriveResponse<T>> typeRef) throws IOException {
+        String url = buildUrl(endpoint) + buildQueryString(queryParams);
 
         HttpRequest request = HttpRequest.builder()
             .uri(URI.create(url))
@@ -85,13 +91,13 @@ public class PipedriveClient implements Closeable {
         return executeRequest(request, typeRef);
     }
 
-    public <T> PipedriveResponse<T> put(String endpoint, Object body, TypeReference<PipedriveResponse<T>> typeRef) throws IOException {
+    public <T> PipedriveResponse<T> patch(String endpoint, Object body, TypeReference<PipedriveResponse<T>> typeRef) throws IOException {
         String url = buildUrl(endpoint);
         String jsonBody = objectMapper.writeValueAsString(body);
 
         HttpRequest request = HttpRequest.builder()
             .uri(URI.create(url))
-            .method("PUT")
+            .method("PATCH")
             .headers(HttpHeaders.of(mergeHeaders(Map.of("Content-Type", List.of("application/json"))), (s1, s2) -> true))
             .body(
                 HttpRequest.StringRequestBody.builder()
@@ -155,6 +161,19 @@ public class PipedriveClient implements Closeable {
 
     private String buildUrl(String endpoint) {
         return baseUrl + endpoint;
+    }
+
+    private String buildQueryString(Map<String, String> queryParams) {
+        if (queryParams == null || queryParams.isEmpty()) {
+            return "";
+        }
+
+        String query = queryParams.entrySet().stream()
+            .filter(entry -> entry.getValue() != null)
+            .map(entry -> URLEncoder.encode(entry.getKey(), StandardCharsets.UTF_8) + "=" + URLEncoder.encode(entry.getValue(), StandardCharsets.UTF_8))
+            .collect(Collectors.joining("&"));
+
+        return query.isEmpty() ? "" : "?" + query;
     }
 
     @Override

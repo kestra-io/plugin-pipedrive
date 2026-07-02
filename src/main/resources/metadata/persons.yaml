@@ -1,8 +1,8 @@
 group: "io.kestra.plugin.pipedrive.persons"
 name: "pipedrive-persons"
 title: "Pipedrive Persons"
-description: "Tasks that create or fetch persons from Pipedrive."
-body: "Use your `apiToken` to add or retrieve person records with properties like `name`, `email`, `phone`, and organization IDs, returning the contact data for enrichment or downstream syncing."
+description: "Tasks that create, retrieve, update, list, and delete persons in Pipedrive."
+body: "Use your `apiToken` to add, retrieve, update, filter, or remove person records with properties like `name`, `email`, `phone`, and organization IDs, returning the contact data for enrichment or downstream syncing."
 videos: []
 createdBy: "Kestra Core Team"
 managedBy: "Kestra Core Team"

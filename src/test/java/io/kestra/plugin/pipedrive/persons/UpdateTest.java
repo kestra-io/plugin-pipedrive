@@ -1,6 +1,7 @@
-package io.kestra.plugin.pipedrive.deals;
+package io.kestra.plugin.pipedrive.persons;
 
-import java.math.BigDecimal;
+import java.util.List;
+import java.util.Map;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -17,6 +18,7 @@ import okhttp3.mockwebserver.MockWebServer;
 import okhttp3.mockwebserver.RecordedRequest;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
@@ -45,7 +47,7 @@ class UpdateTest {
     }
 
     @Test
-    void shouldUpdateDeal() throws Exception {
+    void shouldUpdatePerson() throws Exception {
         mockWebServer.enqueue(
             new MockResponse()
                 .setResponseCode(200)
@@ -54,9 +56,9 @@ class UpdateTest {
                     {
                       "success": true,
                       "data": {
-                        "id": 987,
-                        "status": "won",
-                        "update_time": "2024-02-01T00:00:00Z"
+                        "id": 55,
+                        "name": "Jane Doe",
+                        "update_time": "2024-04-01T00:00:00Z"
                       }
                     }
                     """)
@@ -67,9 +69,15 @@ class UpdateTest {
         Update task = Update.builder()
             .apiToken(Property.ofValue("token"))
             .apiUrl(Property.ofValue(baseUrl()))
-            .dealId(Property.ofValue(987))
-            .status(Property.ofValue("won"))
-            .value(Property.ofValue(BigDecimal.valueOf(25000)))
+            .personId(Property.ofValue(55))
+            .orgId(Property.ofValue(42))
+            .emails(
+                Property.ofValue(
+                    List.of(
+                        Map.of("value", "jane.doe@newcompany.com", "primary", true)
+                    )
+                )
+            )
             .build();
 
         Update.Output output = task.run(runContext);
@@ -78,14 +86,13 @@ class UpdateTest {
         String body = recordedRequest.getBody().readUtf8();
 
         assertThat(recordedRequest.getMethod(), is("PATCH"));
-        assertThat(recordedRequest.getPath(), is("/v2/deals/987"));
+        assertThat(recordedRequest.getPath(), is("/v2/persons/55"));
         assertThat(recordedRequest.getPath(), not(containsString("api_token")));
         assertThat(recordedRequest.getHeader("x-api-token"), is("token"));
-        assertThat(body, containsString("won"));
-        assertThat(body, containsString("25000"));
+        assertThat(body, allOf(containsString("org_id"), containsString("jane.doe@newcompany.com")));
 
-        assertThat(output.getDealId(), is(987));
-        assertThat(output.getUpdateTime(), is("2024-02-01T00:00:00Z"));
+        assertThat(output.getPersonId(), is(55));
+        assertThat(output.getUpdateTime(), is("2024-04-01T00:00:00Z"));
     }
 
     @Test
@@ -95,9 +102,36 @@ class UpdateTest {
         Update task = Update.builder()
             .apiToken(Property.ofValue("token"))
             .apiUrl(Property.ofValue(baseUrl()))
-            .dealId(Property.ofValue(12))
+            .personId(Property.ofValue(55))
             .build();
 
         assertThrows(IllegalArgumentException.class, () -> task.run(runContext));
+    }
+
+    @Test
+    void shouldThrowWhenUpdateFails() {
+        mockWebServer.enqueue(
+            new MockResponse()
+                .setResponseCode(200)
+                .setHeader("Content-Type", "application/json")
+                .setBody("""
+                    {
+                      "success": false,
+                      "error": "Person not found"
+                    }
+                    """)
+        );
+
+        RunContext runContext = runContextFactory.of();
+
+        Update task = Update.builder()
+            .apiToken(Property.ofValue("token"))
+            .apiUrl(Property.ofValue(baseUrl()))
+            .personId(Property.ofValue(999))
+            .orgId(Property.ofValue(42))
+            .build();
+
+        IllegalStateException exception = assertThrows(IllegalStateException.class, () -> task.run(runContext));
+        assertThat(exception.getMessage(), containsString("Person not found"));
     }
 }
