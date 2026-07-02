@@ -3,7 +3,7 @@
 ## What
 
 - Provides plugin components under `io.kestra.plugin.pipedrive`.
-- Includes classes such as `Create`, `Update`, `Deal`, `Person`.
+- Includes classes such as `deals.Create`, `deals.Get`, `deals.Update`, `deals.List`, `deals.Delete`, `persons.Create`, `persons.Get`, `persons.Update`, `persons.List`, `persons.Delete`, `Deal`, `Person`.
 
 ## Why
 
@@ -28,9 +28,15 @@ Infrastructure dependencies (Docker Compose services):
 ### Key Plugin Classes
 
 - `io.kestra.plugin.pipedrive.deals.Create`
+- `io.kestra.plugin.pipedrive.deals.Get`
 - `io.kestra.plugin.pipedrive.deals.Update`
+- `io.kestra.plugin.pipedrive.deals.List`
+- `io.kestra.plugin.pipedrive.deals.Delete`
 - `io.kestra.plugin.pipedrive.persons.Create`
 - `io.kestra.plugin.pipedrive.persons.Get`
+- `io.kestra.plugin.pipedrive.persons.Update`
+- `io.kestra.plugin.pipedrive.persons.List`
+- `io.kestra.plugin.pipedrive.persons.Delete`
 
 ### Project Structure
 
