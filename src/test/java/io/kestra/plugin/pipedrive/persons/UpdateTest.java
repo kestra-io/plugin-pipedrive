@@ -22,9 +22,10 @@ import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @KestraTest
-class CreateTest {
+class UpdateTest {
     @Inject
     private RunContextFactory runContextFactory;
 
@@ -46,7 +47,7 @@ class CreateTest {
     }
 
     @Test
-    void shouldCreatePerson() throws Exception {
+    void shouldUpdatePerson() throws Exception {
         mockWebServer.enqueue(
             new MockResponse()
                 .setResponseCode(200)
@@ -57,10 +58,7 @@ class CreateTest {
                       "data": {
                         "id": 55,
                         "name": "Jane Doe",
-                        "first_name": "Jane",
-                        "last_name": "Doe",
-                        "add_time": "2024-03-01T00:00:00Z",
-                        "update_time": "2024-03-01T00:00:00Z"
+                        "update_time": "2024-04-01T00:00:00Z"
                       }
                     }
                     """)
@@ -68,47 +66,72 @@ class CreateTest {
 
         RunContext runContext = runContextFactory.of();
 
-        Create task = Create.builder()
+        Update task = Update.builder()
             .apiToken(Property.ofValue("token"))
             .apiUrl(Property.ofValue(baseUrl()))
-            .name(Property.ofValue("Jane Doe"))
-            .orgId(Property.ofValue(123))
-            .visibleTo(Property.ofValue("3"))
+            .personId(Property.ofValue(55))
+            .orgId(Property.ofValue(42))
             .emails(
                 Property.ofValue(
                     List.of(
-                        Map.of("value", "jane.doe@example.com", "primary", true, "label", "work")
-                    )
-                )
-            )
-            .phones(
-                Property.ofValue(
-                    List.of(
-                        Map.of("value", "+1234567890", "primary", true, "label", "mobile")
+                        Map.of("value", "jane.doe@newcompany.com", "primary", true)
                     )
                 )
             )
             .build();
 
-        Create.Output output = task.run(runContext);
+        Update.Output output = task.run(runContext);
 
         RecordedRequest recordedRequest = mockWebServer.takeRequest();
         String body = recordedRequest.getBody().readUtf8();
 
-        assertThat(recordedRequest.getMethod(), is("POST"));
-        assertThat(recordedRequest.getPath(), is("/v2/persons"));
+        assertThat(recordedRequest.getMethod(), is("PATCH"));
+        assertThat(recordedRequest.getPath(), is("/v2/persons/55"));
         assertThat(recordedRequest.getPath(), not(containsString("api_token")));
         assertThat(recordedRequest.getHeader("x-api-token"), is("token"));
-        assertThat(
-            body, allOf(
-                containsString("Jane Doe"),
-                containsString("jane.doe@example.com"),
-                containsString("+1234567890"),
-                containsString("visible_to")
-            )
-        );
+        assertThat(body, allOf(containsString("org_id"), containsString("jane.doe@newcompany.com")));
 
         assertThat(output.getPersonId(), is(55));
-        assertThat(output.getAddTime(), is("2024-03-01T00:00:00Z"));
+        assertThat(output.getUpdateTime(), is("2024-04-01T00:00:00Z"));
+    }
+
+    @Test
+    void shouldRequireAtLeastOneField() {
+        RunContext runContext = runContextFactory.of();
+
+        Update task = Update.builder()
+            .apiToken(Property.ofValue("token"))
+            .apiUrl(Property.ofValue(baseUrl()))
+            .personId(Property.ofValue(55))
+            .build();
+
+        assertThrows(IllegalArgumentException.class, () -> task.run(runContext));
+    }
+
+    @Test
+    void shouldThrowWhenUpdateFails() {
+        mockWebServer.enqueue(
+            new MockResponse()
+                .setResponseCode(200)
+                .setHeader("Content-Type", "application/json")
+                .setBody("""
+                    {
+                      "success": false,
+                      "error": "Person not found"
+                    }
+                    """)
+        );
+
+        RunContext runContext = runContextFactory.of();
+
+        Update task = Update.builder()
+            .apiToken(Property.ofValue("token"))
+            .apiUrl(Property.ofValue(baseUrl()))
+            .personId(Property.ofValue(999))
+            .orgId(Property.ofValue(42))
+            .build();
+
+        IllegalStateException exception = assertThrows(IllegalStateException.class, () -> task.run(runContext));
+        assertThat(exception.getMessage(), containsString("Person not found"));
     }
 }

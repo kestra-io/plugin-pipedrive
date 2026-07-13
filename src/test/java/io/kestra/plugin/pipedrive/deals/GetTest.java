@@ -1,4 +1,4 @@
-package io.kestra.plugin.pipedrive.persons;
+package io.kestra.plugin.pipedrive.deals;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -58,7 +58,7 @@ class GetTest {
 
     @Test
     @SuppressWarnings("unchecked")
-    void shouldStoreFetchedPerson() throws Exception {
+    void shouldStoreFetchedDeal() throws Exception {
         mockWebServer.enqueue(
             new MockResponse()
                 .setResponseCode(200)
@@ -67,10 +67,9 @@ class GetTest {
                     {
                       "success": true,
                       "data": {
-                        "id": 12,
-                        "name": "Jane Doe",
-                        "first_name": "Jane",
-                        "last_name": "Doe"
+                        "id": 321,
+                        "title": "Enterprise Software License",
+                        "status": "open"
                       }
                     }
                     """)
@@ -81,7 +80,7 @@ class GetTest {
         Get task = Get.builder()
             .apiToken(Property.ofValue("token"))
             .apiUrl(Property.ofValue(baseUrl()))
-            .personId(Property.ofValue(12))
+            .dealId(Property.ofValue(321))
             .fetchType(Property.ofValue(FetchType.STORE))
             .build();
 
@@ -89,7 +88,7 @@ class GetTest {
 
         RecordedRequest recordedRequest = mockWebServer.takeRequest();
         assertThat(recordedRequest.getMethod(), is("GET"));
-        assertThat(recordedRequest.getPath(), is("/v2/persons/12"));
+        assertThat(recordedRequest.getPath(), is("/v2/deals/321"));
         assertThat(recordedRequest.getPath(), not(containsString("api_token")));
         assertThat(recordedRequest.getHeader("x-api-token"), is("token"));
 
@@ -107,7 +106,66 @@ class GetTest {
             FileSerde.reader(reader, value -> stored.add((Map<String, Object>) value));
         }
 
-        assertThat(stored.getFirst().get("id"), is(12));
-        assertThat(output.getCount(), is(1));
+        assertThat(stored.getFirst().get("id"), is(321));
+    }
+
+    @Test
+    void shouldFetchOneDeal() throws Exception {
+        mockWebServer.enqueue(
+            new MockResponse()
+                .setResponseCode(200)
+                .setHeader("Content-Type", "application/json")
+                .setBody("""
+                    {
+                      "success": true,
+                      "data": {
+                        "id": 321,
+                        "title": "Enterprise Software License",
+                        "status": "open"
+                      }
+                    }
+                    """)
+        );
+
+        RunContext runContext = runContextFactory.of();
+
+        Get task = Get.builder()
+            .apiToken(Property.ofValue("token"))
+            .apiUrl(Property.ofValue(baseUrl()))
+            .dealId(Property.ofValue(321))
+            .build();
+
+        Get.Output output = task.run(runContext);
+
+        assertThat(output.getDeal().getId(), is(321));
+        assertThat(output.getDeal().getTitle(), is("Enterprise Software License"));
+    }
+
+    @Test
+    void shouldThrowWhenDealNotFound() {
+        mockWebServer.enqueue(
+            new MockResponse()
+                .setResponseCode(200)
+                .setHeader("Content-Type", "application/json")
+                .setBody("""
+                    {
+                      "success": false,
+                      "error": "Deal not found"
+                    }
+                    """)
+        );
+
+        RunContext runContext = runContextFactory.of();
+
+        Get task = Get.builder()
+            .apiToken(Property.ofValue("token"))
+            .apiUrl(Property.ofValue(baseUrl()))
+            .dealId(Property.ofValue(999))
+            .build();
+
+        IllegalStateException exception = org.junit.jupiter.api.Assertions.assertThrows(
+            IllegalStateException.class, () -> task.run(runContext)
+        );
+        assertThat(exception.getMessage(), containsString("Deal not found"));
     }
 }

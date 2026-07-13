@@ -1,6 +1,4 @@
-package io.kestra.plugin.pipedrive.deals;
-
-import java.math.BigDecimal;
+package io.kestra.plugin.pipedrive.persons;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -17,13 +15,13 @@ import okhttp3.mockwebserver.MockWebServer;
 import okhttp3.mockwebserver.RecordedRequest;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @KestraTest
-class CreateTest {
+class DeleteTest {
     @Inject
     private RunContextFactory runContextFactory;
 
@@ -45,7 +43,7 @@ class CreateTest {
     }
 
     @Test
-    void shouldCreateDeal() throws Exception {
+    void shouldDeletePerson() throws Exception {
         mockWebServer.enqueue(
             new MockResponse()
                 .setResponseCode(200)
@@ -54,10 +52,7 @@ class CreateTest {
                     {
                       "success": true,
                       "data": {
-                        "id": 321,
-                        "status": "open",
-                        "add_time": "2024-01-01T00:00:00Z",
-                        "update_time": "2024-01-01T00:00:00Z"
+                        "id": 55
                       }
                     }
                     """)
@@ -65,27 +60,46 @@ class CreateTest {
 
         RunContext runContext = runContextFactory.of();
 
-        Create task = Create.builder()
+        Delete task = Delete.builder()
             .apiToken(Property.ofValue("token"))
             .apiUrl(Property.ofValue(baseUrl()))
-            .title(Property.ofValue("Test Deal"))
-            .value(Property.ofValue(BigDecimal.valueOf(1000)))
-            .currency(Property.ofValue("EUR"))
-            .stageId(Property.ofValue(2))
+            .personId(Property.ofValue(55))
             .build();
 
-        Create.Output output = task.run(runContext);
+        Delete.Output output = task.run(runContext);
 
         RecordedRequest recordedRequest = mockWebServer.takeRequest();
-        String body = recordedRequest.getBody().readUtf8();
-
-        assertThat(recordedRequest.getMethod(), is("POST"));
-        assertThat(recordedRequest.getPath(), is("/v2/deals"));
+        assertThat(recordedRequest.getMethod(), is("DELETE"));
+        assertThat(recordedRequest.getPath(), is("/v2/persons/55"));
         assertThat(recordedRequest.getPath(), not(containsString("api_token")));
         assertThat(recordedRequest.getHeader("x-api-token"), is("token"));
-        assertThat(body, allOf(containsString("Test Deal"), containsString("EUR"), containsString("stage_id")));
 
-        assertThat(output.getDealId(), is(321));
-        assertThat(output.getAddTime(), is("2024-01-01T00:00:00Z"));
+        assertThat(output.getDeleted(), is(true));
+    }
+
+    @Test
+    void shouldThrowWhenDeleteFails() {
+        mockWebServer.enqueue(
+            new MockResponse()
+                .setResponseCode(200)
+                .setHeader("Content-Type", "application/json")
+                .setBody("""
+                    {
+                      "success": false,
+                      "error": "Person not found"
+                    }
+                    """)
+        );
+
+        RunContext runContext = runContextFactory.of();
+
+        Delete task = Delete.builder()
+            .apiToken(Property.ofValue("token"))
+            .apiUrl(Property.ofValue(baseUrl()))
+            .personId(Property.ofValue(999))
+            .build();
+
+        IllegalStateException exception = assertThrows(IllegalStateException.class, () -> task.run(runContext));
+        assertThat(exception.getMessage(), containsString("Person not found"));
     }
 }

@@ -33,5 +33,16 @@ public class PipedriveResponse<T> {
     private String errorInfo;
 
     @JsonProperty("additional_data")
-    private Object additionalData;
+    private AdditionalData additionalData;
+
+    @Data
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    public static class AdditionalData {
+        @JsonProperty("next_cursor")
+        private String nextCursor;
+    }
 }
