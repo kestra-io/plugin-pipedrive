@@ -4,7 +4,7 @@ Manage deals and persons in Pipedrive from Kestra flows.
 
 ## Authentication
 
-Set `apiToken` to your Pipedrive API token. Store it in a [secret](https://kestra.io/docs/concepts/secret) and apply it globally with [plugin defaults](https://kestra.io/docs/workflow-components/plugin-defaults).
+Set `apiToken` to your Pipedrive API token. Store it in a [secret](https://kestra.io/docs/concepts/secret) and set it on each task.
 
 ## Tasks
 
